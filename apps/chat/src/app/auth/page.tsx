@@ -23,7 +23,7 @@ const weChatOauthRedirectUrl =
 const CaptchaLogin: React.FC = () => {
   const router = useRouter();
   const [register, setRegister] = useState("");
-  const [code, setCode] = useState("");
+  const [captcha, setCode] = useState("");
 
   const [isSubmitting, handleSubmit] = usePreventFormSubmit();
   const [isCodeSubmitting, handleCodeSubmit] = usePreventFormSubmit();
@@ -48,8 +48,8 @@ const CaptchaLogin: React.FC = () => {
       <div className={styles["row"]}>
         <input
           type="text"
-          id="code"
-          value={code}
+          id="captcha"
+          value={captcha}
           className={styles["auth-input"]}
           onChange={(e) => setCode(e.target.value)}
           placeholder={Locales.User.Code}
@@ -59,12 +59,12 @@ const CaptchaLogin: React.FC = () => {
           text={isCodeSubmitting ? Locales.User.Sent : Locales.User.GetCode}
           className={styles["auth-get-code-btn"]}
           type="primary"
-          onClick={() => requestCode({ identity: register })}
+          onClick={() => requestCode({phone: register})}
         />
       </div>
       <div className={styles["auth-actions"]}>
         <IconButton
-          onClick={() => loginByCode({ identity: register, code })}
+          onClick={() => loginByCode(router,{ phone: register, captcha })}
           text={`${Locales.User.Login} / ${Locales.User.Register}`}
           className={styles["auth-submit-btn"]}
           type="primary"
@@ -72,53 +72,10 @@ const CaptchaLogin: React.FC = () => {
       </div>
     </div>
   );
+
 };
 
-const EmailLogin: React.FC = () => {
-  const router = useRouter();
-  const [identity, setIdentity] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, handleSubmit] = usePreventFormSubmit();
 
-  /* Prevent duplicate form submissions */
-  const loginByPassword = useStore((state) => state.loginByPassword);
-
-  return (
-    <div className={styles["form-container"]}>
-      <div className={styles["row"]}>
-        <input
-          type="text"
-          id="email"
-          value={identity}
-          className={styles["auth-input"]}
-          onChange={(e) => setIdentity(e.target.value)}
-          placeholder={Locales.User.Email}
-          required
-        />
-      </div>
-
-      <div className={styles["row"]}>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          className={styles["auth-input"]}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder={Locales.User.Password}
-          required
-        />
-      </div>
-
-      <div className={styles["auth-actions"]}>
-        <IconButton
-          onClick={() => loginByPassword(router, { identity, password })}
-          text={Locales.User.Submit}
-          type="primary"
-        />
-      </div>
-    </div>
-  );
-};
 
 const WeChatLogin: React.FC = () => {
   const router = useRouter();
@@ -194,16 +151,8 @@ export default function AuthPage() {
             >
               {Locales.User.CodeLogin}
             </button>
-            <button
-              className={`${styles["tab-button"]} ${
-                tab === "email" ? styles.active : ""
-              }`}
-              onClick={() => setTab("email")}
-            >
-              {Locales.User.PasswordLogin}
-            </button>
           </div>
-          {tab === "phone" ? <CaptchaLogin /> : <EmailLogin />}
+          <CaptchaLogin />
 
           <div className={styles["divider"]}>
             <div className={styles["divider-line"]} />

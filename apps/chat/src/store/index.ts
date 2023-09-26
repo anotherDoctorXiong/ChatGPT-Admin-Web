@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useRouter } from "next/navigation";
+import { showToast } from "@/components/ui-lib";
+import { useState } from "react";
 import {
   ChatSession,
   ChatMessage,
@@ -70,7 +72,10 @@ type StoreType = {
 
   // auth
   sessionToken?: string;
-  loginByCode: (data: loginByCodeDto) => void;
+  loginByCode: (
+      router: ReturnType<typeof useRouter>,
+      data: loginByCodeDto
+  ) => void;
   loginByPassword: (
     router: ReturnType<typeof useRouter>,
     data: byPasswordDto,
@@ -269,12 +274,25 @@ export const useStore = create<StoreType>()(
       },
 
       // Auth
-      async loginByCode(data: loginByCodeDto) {
-        fetch(`${BASE_URL}/auth/login`, {
+      async loginByCode(
+          router: ReturnType<typeof useRouter>,
+          data: loginByCodeDto) {
+        fetch(`${BASE_URL}/user/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
-        }).then((res) => {});
+        })
+          .then((res) => res.json())
+          .then((res) => {
+              if (res.code == 200) {
+                  set((state) => ({
+                      sessionToken: res.token,
+                  }));
+                  router.push("/");
+              } else {
+                  router.refresh();
+              }
+          });
       },
 
       async loginByPassword(
@@ -315,11 +333,16 @@ export const useStore = create<StoreType>()(
           });
       },
 
-      async requestCode(data: requestCodeDto) {
-        fetch(`${BASE_URL}/auth/request-code`, {
+      async requestCode(data: requestCodeDto){
+        fetch(`${BASE_URL}/user/loginCode`, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
-        }).then((res) => {});
+        })
+          .then((res) => res.json())
+          .then((res) => {
+              showToast(res.message);
+          });
       },
 
       async register(code: string, data: byPasswordDto) {

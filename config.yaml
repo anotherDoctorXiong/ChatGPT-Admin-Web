@@ -2,7 +2,7 @@ site:
   title: 'ChatGPT-Admin-Web' # 网站标题
   oa: '微信公众号' # 微信公众号
 url:
-  backend: http://server:3001 # docker-compose 默认地址
+  backend: http://127.0.0.1:8080/v1/gpt # docker-compose 默认地址
 port:
   frontend: 3000
   backend: 3001

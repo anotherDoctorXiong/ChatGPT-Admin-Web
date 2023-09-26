@@ -1,9 +1,9 @@
 export interface requestCodeDto {
-  identity: string;
+  phone: string;
 }
 
 export interface loginByCodeDto extends requestCodeDto {
-  code: string;
+  captcha: string;
 }
 
 export interface byPasswordDto extends requestCodeDto {
